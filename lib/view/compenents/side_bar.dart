@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/src/foundation/key.dart';
 import 'package:flutter/src/widgets/framework.dart';
+import 'package:umltodart/models/shape.dart';
 
 import '../../constants.dart';
-import '../../models/shape.dart';
 
 class SideBar extends StatelessWidget {
   const SideBar({Key? key}) : super(key: key);
@@ -13,9 +13,27 @@ class SideBar extends StatelessWidget {
     return Drawer(
       child: Column(
         children: <Widget>[
-          Shape(
-            xPos: 0,
-            yPos: 0,
+          Draggable<Container>(
+            data: Container(
+              width: 50,
+              height: 50,
+              color: Colors.blue,
+            ),
+            feedback: Container(
+              width: 50,
+              height: 50,
+              color: Colors.blue,
+            ),
+            child: Container(
+              width: 50,
+              height: 50,
+              color: Colors.green,
+            ),
+            childWhenDragging: Container(
+              width: 50,
+              height: 50,
+              color: Colors.redAccent,
+            ),
           )
         ],
       ),

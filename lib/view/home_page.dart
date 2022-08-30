@@ -175,7 +175,7 @@ class _HomePageState extends State<HomePage> {
                 child: SizedBox(
                   width: width,
                   height: height,
-                  child: DragTarget<Shape>(
+                  child: DragTarget<Container>(
                     builder: (context, _, __) {
                       return Stack(
                           children: shapes.map((e) {
