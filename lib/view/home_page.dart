@@ -106,6 +106,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:umltodart/constants.dart';
 import 'package:umltodart/models/shape.dart';
 
+import '../commend.dart';
 import 'compenents/side_bar.dart';
 
 class HomePage extends StatefulWidget {
@@ -118,7 +119,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   Container test = Container();
   Offset offset = Offset.zero;
-  List<List> shapes = [];
+  List<Shape> shapes = [];
   ScrollController _scrollControllerV = ScrollController();
   ScrollController _scrollControllerH = ScrollController();
   double height =
@@ -127,6 +128,7 @@ class _HomePageState extends State<HomePage> {
   double width =
       MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width -
           100;
+  CommandHistory _commandHistory = CommandHistory();
 
   @override
   void initState() {
@@ -154,7 +156,13 @@ class _HomePageState extends State<HomePage> {
         elevation: 10,
         backgroundColor: kMainColor,
         actions: [
-          IconButton(onPressed: () {}, icon: const Icon(Icons.undo_sharp)),
+          IconButton(
+              onPressed: () {
+                setState(() {
+                  _commandHistory.undo();
+                });
+              },
+              icon: const Icon(Icons.undo_sharp)),
           IconButton(
               onPressed: () {}, icon: const Icon(Icons.play_arrow_sharp)),
           IconButton(onPressed: () {}, icon: const Icon(Icons.redo_sharp)),
@@ -175,35 +183,43 @@ class _HomePageState extends State<HomePage> {
                 child: SizedBox(
                   width: width,
                   height: height,
-                  child: DragTarget<Container>(
-                    builder: (context, _, __) {
-                      return Stack(
-                          children: shapes.map((e) {
-                        return Positioned(
-                          left: e[0],
-                          top: e[1],
-                          child: Draggable<Container>(
-                            data: e[2],
-                            feedback: e[2],
-                            child: e[2],
-                          ),
-                        );
-                      }).toList());
-                    },
-                    onAcceptWithDetails: (details) {
-                      setState(() {
-                        for (var e in shapes) {
-                          if (e[2] == details.data) {
-                            shapes.remove(e);
+                  child: GridPaper(
+                    child: DragTarget<Shape>(
+                      builder: (context, _, __) {
+                        return Stack(
+                            children: shapes.map((e) {
+                          return Positioned(
+                            left: e.xPos,
+                            top: e.yPos,
+                            child: Draggable<Shape>(
+                              data: e,
+                              feedback: e.build(isPlaced: true),
+                              child: e.build(isPlaced: true),
+                            ),
+                          );
+                        }).toList());
+                      },
+                      onAcceptWithDetails: (details) {
+                        setState(() {
+                          Shape shape = details.data;
+                          if (!shapes.contains(shape)) {
+                            shape.setPosition(details.offset.dx - 200,
+                                details.offset.dy - 46);
+                            var command =
+                                AddShapeCommend(shapes: shapes, shape: shape);
+                            command.execute();
+                            _commandHistory.add(command);
+                            return;
                           }
-                        }
-                        shapes.add([
-                          details.offset.dx - 200 + _scrollControllerH.offset,
-                          details.offset.dy - 50 + _scrollControllerV.offset,
-                          details.data
-                        ]);
-                      });
-                    },
+                          var command = EditShapePosCommend(
+                              shape: shape,
+                              xPos: details.offset.dx - 200,
+                              yPos: details.offset.dy - 46);
+                          command.execute();
+                          _commandHistory.add(command);
+                        });
+                      },
+                    ),
                   ),
                 ),
               ),

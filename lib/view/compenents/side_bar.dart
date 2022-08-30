@@ -13,27 +13,10 @@ class SideBar extends StatelessWidget {
     return Drawer(
       child: Column(
         children: <Widget>[
-          Draggable<Container>(
-            data: Container(
-              width: 50,
-              height: 50,
-              color: Colors.blue,
-            ),
-            feedback: Container(
-              width: 50,
-              height: 50,
-              color: Colors.blue,
-            ),
-            child: Container(
-              width: 50,
-              height: 50,
-              color: Colors.green,
-            ),
-            childWhenDragging: Container(
-              width: 50,
-              height: 50,
-              color: Colors.redAccent,
-            ),
+          Draggable<Shape>(
+            data: Test(0,0),
+            feedback: Test(0,0).build(),
+            child: Test(0,0).build()
           )
         ],
       ),
