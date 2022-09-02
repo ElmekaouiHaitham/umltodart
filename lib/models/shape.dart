@@ -21,17 +21,24 @@ class ShapeContainer extends StatelessWidget {
     return Positioned(
       left: shape.xPos,
       top: shape.yPos,
-      child: Draggable<Shape>(
-        data: shape,
-        feedback: shape.build(),
-        child: shape.build(),
-      ),
+      child: Column(children: [
+        IconButton(
+            icon: Icon(Icons.add),
+            onPressed: () {
+              print("hi");
+            }),
+        Draggable<Shape>(
+          data: shape,
+          feedback: shape.build(),
+          child: shape.build(),
+        ),
+      ]),
     );
   }
 }
 
-class Test extends Shape {
-  Test(double xPos, double yPos)
+class Class extends Shape {
+  Class(double xPos, double yPos)
       : super(
           xPos,
           yPos,
@@ -43,14 +50,6 @@ class Test extends Shape {
       width: 50,
       height: 50,
       color: Colors.blue,
-      child: isPlaced
-          ? GestureDetector(
-              child: Icon(Icons.add_circle),
-              onTap: () {
-                print("hello");
-              },
-            )
-          : Container(),
     );
   }
 }

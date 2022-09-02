@@ -165,7 +165,6 @@ class _HomePageState extends State<HomePage> {
               icon: const Icon(Icons.undo_sharp)),
           IconButton(
               onPressed: () {}, icon: const Icon(Icons.play_arrow_sharp)),
-          IconButton(onPressed: () {}, icon: const Icon(Icons.redo_sharp)),
         ],
       ),
       body: Row(
@@ -188,14 +187,8 @@ class _HomePageState extends State<HomePage> {
                       builder: (context, _, __) {
                         return Stack(
                             children: shapes.map((e) {
-                          return Positioned(
-                            left: e.xPos,
-                            top: e.yPos,
-                            child: Draggable<Shape>(
-                              data: e,
-                              feedback: e.build(isPlaced: true),
-                              child: e.build(isPlaced: true),
-                            ),
+                          return ShapeContainer(
+                            shape: e,
                           );
                         }).toList());
                       },
@@ -204,7 +197,7 @@ class _HomePageState extends State<HomePage> {
                           Shape shape = details.data;
                           if (!shapes.contains(shape)) {
                             shape.setPosition(details.offset.dx - 200,
-                                details.offset.dy - 46);
+                                details.offset.dy - 56);
                             var command =
                                 AddShapeCommend(shapes: shapes, shape: shape);
                             command.execute();

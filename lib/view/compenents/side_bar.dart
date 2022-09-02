@@ -14,9 +14,9 @@ class SideBar extends StatelessWidget {
       child: Column(
         children: <Widget>[
           Draggable<Shape>(
-            data: Test(0,0),
-            feedback: Test(0,0).build(),
-            child: Test(0,0).build()
+            data: Class(0,0),
+            feedback: Class(0,0).build(),
+            child: Class(0,0).build()
           )
         ],
       ),
