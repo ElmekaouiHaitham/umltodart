@@ -1,6 +1,6 @@
 import 'dart:collection';
 
-import 'models/shape.dart';
+import '../models/shape.dart';
 
 abstract class Command {
   void execute();

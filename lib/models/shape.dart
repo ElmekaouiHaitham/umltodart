@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:get/get.dart';
-import '../constants.dart';
+import '../utils/constants.dart';
+import '../view/components/input_field.dart';
 import 'field.dart';
 import 'method.dart';
 
@@ -23,59 +24,6 @@ abstract class Shape {
   void add(void Function(void Function() fn) setState);
 }
 
-class ShapeContainer extends StatefulWidget {
-  final Shape shape;
-  final Function() onDelete;
-  const ShapeContainer({Key? key, required this.shape, required this.onDelete})
-      : super(key: key);
-  @override
-  State<StatefulWidget> createState() => _ShapeContainerState();
-}
-
-class _ShapeContainerState extends State<ShapeContainer> {
-  @override
-  Widget build(BuildContext context) {
-    var shape = widget.shape;
-    return Positioned(
-      left: shape.xPos,
-      top: shape.yPos,
-      child: Column(children: [
-        Row(
-          children: [
-            GestureDetector(
-              onTap: () {
-                shape.remove(setState);
-              },
-              child: const Icon(Icons.remove),
-            ),
-            GestureDetector(
-              onTap: () {
-                shape.edit(setState);
-              },
-              child: const Icon(Icons.edit),
-            ),
-            GestureDetector(
-              onTap: widget.onDelete,
-              child: const Icon(Icons.delete, color: Colors.red),
-            ),
-            GestureDetector(
-              child: Icon(Icons.add),
-              onTap: () {
-                shape.add(setState);
-              },
-            ),
-          ],
-        ),
-        Draggable<Shape>(
-          data: shape,
-          feedback: shape.build(isPlaced: true),
-          child: shape.build(isPlaced: true),
-        ),
-      ]),
-    );
-  }
-}
-
 class Class extends Shape {
   Class(double xPos, double yPos)
       : super(
@@ -92,43 +40,46 @@ class Class extends Shape {
   Widget build({bool isPlaced = false}) {
     return Card(
       child: Container(
-        width: 200,
-        // color: Colors.blue,
+        constraints: const BoxConstraints(
+            minWidth: kShapeMinWidth, maxWidth: kShapeMaxWidth),
         decoration:
             BoxDecoration(border: Border.all(color: Colors.white, width: 2)),
-        child: Column(
-          children: [
-            TextField(
-              controller: _titleController,
-              decoration: const InputDecoration(
-                border: InputBorder.none,
-                hintText: "class's name",
-                contentPadding: EdgeInsets.all(kDefaultPadding),
+        child: IntrinsicWidth(
+          child: Column(
+            children: [
+              TextField(
+                controller: _titleController,
+                decoration: const InputDecoration(
+                  border: InputBorder.none,
+                  hintText: "class's name",
+                  contentPadding: EdgeInsets.all(kDefaultPadding),
+                ),
+                readOnly: !isPlaced,
               ),
-              readOnly: !isPlaced,
-            ),
-            const Divider(thickness: 2, color: Colors.white),
-            // fields
-            Padding(
-                padding: EdgeInsets.all(kDefaultPadding),
-                child: Column(
-                  children: fields
-                      .map(
-                        (f) => Text(f.toString()),
-                      )
-                      .toList(),
-                )),
-            const Divider(thickness: 2, color: Colors.white),
-            Padding(
-                padding: EdgeInsets.all(kDefaultPadding),
-                child: Column(
-                  children: methods
-                      .map(
-                        (f) => Text(f.toString()),
-                      )
-                      .toList(),
-                )),
-          ],
+              const Divider(thickness: 2, color: Colors.white),
+              // fields
+              Padding(
+                  padding: const EdgeInsets.all(kDefaultPadding),
+                  child: Column(
+                    children: fields
+                        .map(
+                          (f) => Text(f.toString()),
+                        )
+                        .toList(),
+                  )),
+              const Divider(thickness: 2, color: Colors.white),
+              // methods
+              Padding(
+                  padding: const EdgeInsets.all(kDefaultPadding),
+                  child: Column(
+                    children: methods
+                        .map(
+                          (f) => Text(f.toString()),
+                        )
+                        .toList(),
+                  )),
+            ],
+          ),
         ),
       ),
     );
@@ -144,13 +95,13 @@ class Class extends Shape {
                 Get.back();
                 addField(setState);
               },
-              child: Text("field")),
+              child: const Text('field')),
           ElevatedButton(
               onPressed: () {
                 Get.back();
                 addMethod(setState);
               },
-              child: Text("method")),
+              child: const Text('method')),
         ]),
       ),
     ));
@@ -166,55 +117,43 @@ class Class extends Shape {
         child: Column(
           children: [
             // name section
-            SizedBox(
-              height: kDefaultInputHeight,
-              width: kDefaultInputWidth,
-              child: TextField(
-                controller: nameController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: "method's name",
-                  contentPadding: EdgeInsets.all(kDefaultPadding),
-                ),
-              ),
-            ),
+            MyInputField(
+                nameController: nameController, hintText: "method's name"),
             // args section
             StatefulBuilder(builder: (context, setState) {
               return Column(
                 children: [
-                  Container(
-                    child: FittedBox(
-                      fit: BoxFit.scaleDown,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          IconButton(
-                            icon: Icon(Icons.remove),
-                            onPressed: () {
-                              if (argNamesController.length > 0) {
-                                setState(() {
-                                  argNamesController.removeLast();
-                                });
-                              }
-                            },
-                          ),
-                          Text(
-                            '${argNamesController.length}',
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.add),
-                            onPressed: () {
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.remove),
+                          onPressed: () {
+                            if (argNamesController.isNotEmpty) {
                               setState(() {
-                                argNamesController.add(TextEditingController());
-                                argTypeController.add(TextEditingController());
+                                argNamesController.removeLast();
                               });
-                            },
-                          ),
-                        ],
-                      ),
+                            }
+                          },
+                        ),
+                        Text(
+                          '${argNamesController.length}',
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.add),
+                          onPressed: () {
+                            setState(() {
+                              argNamesController.add(TextEditingController());
+                              argTypeController.add(TextEditingController());
+                            });
+                          },
+                        ),
+                      ],
                     ),
                   ),
-                  Divider(
+                  const Divider(
                     color: Colors.grey,
                     thickness: 1,
                     indent: 20,
@@ -225,36 +164,19 @@ class Class extends Shape {
                       (index) => Column(
                             children: [
                               Row(children: [
-                                SizedBox(
-                                  height: kDefaultInputHeight,
-                                  width: kDefaultInputWidth,
-                                  child: TextField(
-                                    controller: argNamesController[index],
-                                    decoration: const InputDecoration(
-                                      border: OutlineInputBorder(),
-                                      hintText: "arg's name",
-                                      contentPadding:
-                                          EdgeInsets.all(kDefaultPadding),
-                                    ),
-                                  ),
-                                ),
+                                // args' name
+                                MyInputField(
+                                    nameController: argNamesController[index],
+                                    hintText: "arg's name"),
+                                // the ":"
                                 const Padding(
                                     padding: EdgeInsets.symmetric(
                                         horizontal: kSmallPadding),
-                                    child: Text(":")),
-                                SizedBox(
-                                  height: kDefaultInputHeight,
-                                  width: kDefaultInputWidth,
-                                  child: TextField(
-                                    controller: argTypeController[index],
-                                    decoration: const InputDecoration(
-                                      border: OutlineInputBorder(),
-                                      hintText: "arg's type",
-                                      contentPadding:
-                                          EdgeInsets.all(kDefaultPadding),
-                                    ),
-                                  ),
-                                ),
+                                    child: Text(':')),
+                                // arg's type
+                                MyInputField(
+                                    nameController: argTypeController[index],
+                                    hintText: "arg's type"),
                               ]),
                               const SizedBox(height: kSmallPadding),
                             ],
@@ -263,18 +185,9 @@ class Class extends Shape {
               );
             }),
             // return type section
-            SizedBox(
-              height: kDefaultInputHeight,
-              width: kDefaultInputWidth,
-              child: TextField(
-                controller: returnTypeController,
-                decoration: const InputDecoration(
-                  border: OutlineInputBorder(),
-                  hintText: "method's return type",
-                  contentPadding: EdgeInsets.all(kDefaultPadding),
-                ),
-              ),
-            ),
+            MyInputField(
+                nameController: returnTypeController,
+                hintText: "method's return type"),
           ],
         ),
       ),
@@ -294,7 +207,7 @@ class Class extends Shape {
               Get.back();
               setState(() {});
             },
-            child: const Text("done"))
+            child: const Text('done'))
       ],
     ));
   }
@@ -304,33 +217,13 @@ class Class extends Shape {
     final TextEditingController fieldTypeController = TextEditingController();
     Get.dialog(AlertDialog(
       content: Row(children: [
-        SizedBox(
-          height: kDefaultInputHeight,
-          width: kDefaultInputWidth,
-          child: TextField(
-            controller: fieldNameController,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: "fields's name",
-              contentPadding: EdgeInsets.all(kDefaultPadding),
-            ),
-          ),
-        ),
+        MyInputField(
+            nameController: fieldNameController, hintText: "field's name"),
         const Padding(
             padding: EdgeInsets.symmetric(horizontal: kSmallPadding),
-            child: Text(":")),
-        SizedBox(
-          height: kDefaultInputHeight,
-          width: kDefaultInputWidth,
-          child: TextField(
-            controller: fieldTypeController,
-            decoration: const InputDecoration(
-              border: OutlineInputBorder(),
-              hintText: "fields's type",
-              contentPadding: EdgeInsets.all(kDefaultPadding),
-            ),
-          ),
-        ),
+            child: Text(':')),
+        MyInputField(
+            nameController: fieldTypeController, hintText: "field's type")
       ]),
       actions: [
         TextButton(
@@ -341,13 +234,15 @@ class Class extends Shape {
               Get.back();
               setState(() {});
             },
-            child: const Text("done"))
+            child: const Text('done'))
       ],
     ));
   }
 
   @override
-  void edit(setState) {}
+  void edit(setState) {
+    // TODO: implement edit
+  }
 
   @override
   void remove(setState) {

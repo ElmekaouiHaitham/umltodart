@@ -9,13 +9,13 @@ class Method {
 
   @override
   String toString() {
-    return "$name(${argsToString()}): $returnType";
+    return '$name(${argsToString()}): $returnType';
   }
 
   String argsToString() {
-    String result = "";
+    String result = '';
     for (var element in parameters) {
-      result += "$element,";
+      result += '$element,';
     }
     return result;
   }

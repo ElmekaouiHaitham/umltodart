@@ -5,6 +5,6 @@ class Field {
 
   @override
   String toString() {
-    return "$name: $type";
+    return '$name: $type';
   }
 }
