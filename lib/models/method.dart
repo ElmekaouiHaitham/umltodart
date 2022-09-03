@@ -14,9 +14,9 @@ class Method {
 
   String argsToString() {
     String result = "";
-    parameters.forEach((element) {
-      result += element.toString() + ",";
-    });
+    for (var element in parameters) {
+      result += "$element,";
+    }
     return result;
   }
 }
