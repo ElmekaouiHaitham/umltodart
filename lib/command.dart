@@ -7,10 +7,10 @@ abstract class Command {
   void undo();
 }
 
-class AddShapeCommend implements Command {
+class AddShapeCommand implements Command {
   Shape shape;
   List<Shape> shapes;
-  AddShapeCommend({required this.shape, required this.shapes});
+  AddShapeCommand({required this.shape, required this.shapes});
 
   @override
   void execute() {
@@ -23,13 +23,29 @@ class AddShapeCommend implements Command {
   }
 }
 
-class EditShapePosCommend implements Command {
+class RemoveShapeCommand implements Command {
+  Shape shape;
+  List<Shape> shapes;
+  RemoveShapeCommand({required this.shape, required this.shapes});
+
+  @override
+  void execute() {
+    shapes.remove(shape);
+  }
+
+  @override
+  void undo() {
+    shapes.add(shape);
+  }
+}
+
+class EditShapePosCommand implements Command {
   Shape shape;
   late double perviousXPos;
   late double perviousYPos;
   double xPos;
   double yPos;
-  EditShapePosCommend({
+  EditShapePosCommand({
     required this.shape,
     required this.xPos,
     required this.yPos,

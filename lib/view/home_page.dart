@@ -106,7 +106,7 @@ import 'package:flutter/src/widgets/framework.dart';
 import 'package:umltodart/constants.dart';
 import 'package:umltodart/models/shape.dart';
 
-import '../commend.dart';
+import '../Command.dart';
 import 'compenents/side_bar.dart';
 
 class HomePage extends StatefulWidget {
@@ -188,6 +188,14 @@ class _HomePageState extends State<HomePage> {
                         return Stack(
                             children: shapes.map((e) {
                           return ShapeContainer(
+                            onDelete: () {
+                              setState(() {
+                                var command = RemoveShapeCommand(
+                                    shapes: shapes, shape: e);
+                                command.execute();
+                                _commandHistory.add(command);
+                              });
+                            },
                             shape: e,
                           );
                         }).toList());
@@ -199,12 +207,12 @@ class _HomePageState extends State<HomePage> {
                             shape.setPosition(details.offset.dx - 200,
                                 details.offset.dy - 56);
                             var command =
-                                AddShapeCommend(shapes: shapes, shape: shape);
+                                AddShapeCommand(shapes: shapes, shape: shape);
                             command.execute();
                             _commandHistory.add(command);
                             return;
                           }
-                          var command = EditShapePosCommend(
+                          var command = EditShapePosCommand(
                               shape: shape,
                               xPos: details.offset.dx - 200,
                               yPos: details.offset.dy - 46);
