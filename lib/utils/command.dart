@@ -53,14 +53,14 @@ class EditShapePosCommand implements Command {
 
   @override
   void execute() {
-    perviousXPos = shape.xPos;
-    perviousYPos = shape.yPos;
-    shape.setPosition(xPos, yPos);
+    perviousXPos = shape.controller.xPos;
+    perviousYPos = shape.controller.yPos;
+    shape.controller.setPosition(xPos, yPos);
   }
 
   @override
   void undo() {
-    shape.setPosition(perviousXPos, perviousYPos);
+    shape.controller.setPosition(perviousXPos, perviousYPos);
   }
 }
 

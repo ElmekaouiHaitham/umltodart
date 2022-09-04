@@ -80,20 +80,13 @@ class _HomePageState extends State<HomePage> {
             width: width,
             height: height,
             child: GridPaper(
-              child: DragTarget<Shape>(
+              child: DragTarget(
                 builder: (context, _, __) {
                   return Stack(
-                      children: shapes.map((e) {
+                      children: shapes.map((shape) {
                     return ShapeContainer(
-                      onShapeDelete: () {
-                        setState(() {
-                          var command =
-                              RemoveShapeCommand(shapes: shapes, shape: e);
-                          command.execute();
-                          _commandHistory.add(command);
-                        });
-                      },
-                      shape: e,
+                      onShapeDelete: () => onShapeDelete(shape),
+                      child: shape,
                     );
                   }).toList());
                 },
@@ -106,25 +99,41 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void onAccept(DragTargetDetails<Shape> details) {
+  void onAccept(DragTargetDetails details) {
     setState(() {
       Shape shape = details.data;
       double xPos = details.offset.dx - 200 + _scrollControllerH.offset;
       double yPos = details.offset.dy - 56 + _scrollControllerV.offset;
       // if the shape is dragged from side_bare
       if (!shapes.contains(shape)) {
-        shape.setPosition(xPos, yPos);
-        var command = AddShapeCommand(shapes: shapes, shape: shape);
-        _executeCommand(command);
+        _addShape(shape, xPos, yPos);
         return;
       }
-      var command = EditShapePosCommand(shape: shape, xPos: xPos, yPos: yPos);
-      _executeCommand(command);
+      _editShapePos(shape, xPos, yPos);
     });
+  }
+
+  void _editShapePos(Shape shape, double xPos, double yPos) {
+    var command = EditShapePosCommand(shape: shape, xPos: xPos, yPos: yPos);
+    _executeCommand(command);
+  }
+
+  void _addShape(Shape shape, double xPos, double yPos) {
+    shape.controller.setPosition(xPos, yPos);
+    var command = AddShapeCommand(shapes: shapes, shape: shape);
+    _executeCommand(command);
   }
 
   void _executeCommand(Command command) {
     command.execute();
     _commandHistory.add(command);
+  }
+
+  onShapeDelete(Shape shape) {
+    setState(() {
+      var command = RemoveShapeCommand(shapes: shapes, shape: shape);
+      command.execute();
+      _commandHistory.add(command);
+    });
   }
 }

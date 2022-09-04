@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-
-import '../../models/shape.dart';
+import 'package:umltodart/controllers/shape_controller.dart';
+import 'package:umltodart/models/shape.dart';
 
 class ShapeContainer extends StatefulWidget {
-  final Shape shape;
+  final Shape child;
   final Function() onShapeDelete;
   const ShapeContainer(
-      {Key? key, required this.shape, required this.onShapeDelete})
+      {Key? key, required this.child, required this.onShapeDelete})
       : super(key: key);
   @override
   State<StatefulWidget> createState() => _ShapeContainerState();
@@ -15,37 +15,32 @@ class ShapeContainer extends StatefulWidget {
 class _ShapeContainerState extends State<ShapeContainer> {
   @override
   Widget build(BuildContext context) {
-    Shape shape = widget.shape;
-
+    ShapeController shapeController = widget.child.controller;
     return Positioned(
-      left: shape.xPos,
-      top: shape.yPos,
+      left: shapeController.xPos,
+      top: shapeController.yPos,
       child: Column(children: [
         // actions: remove field(method), delete shape, edit field(method), add field(method),
         _buildActions(),
-        Draggable<Shape>(
-          data: shape,
-          feedback: shape.build(isPlaced: true),
-          child: shape.build(isPlaced: true),
+        Draggable(
+          data: widget.child,
+          feedback: widget.child,
+          child: widget.child,
         ),
       ]),
     );
   }
 
   Widget _buildActions() {
-    Shape shape = widget.shape;
+    ShapeController shapeController = widget.child.controller;
     return Row(
       children: [
         GestureDetector(
-          onTap: () {
-            shape.remove(setState);
-          },
+          onTap: shapeController.remove,
           child: const Icon(Icons.remove),
         ),
         GestureDetector(
-          onTap: () {
-            shape.edit(setState);
-          },
+          onTap: shapeController.edit,
           child: const Icon(Icons.edit),
         ),
         GestureDetector(
@@ -53,10 +48,8 @@ class _ShapeContainerState extends State<ShapeContainer> {
           child: const Icon(Icons.delete, color: Colors.red),
         ),
         GestureDetector(
+          onTap: shapeController.add,
           child: const Icon(Icons.add),
-          onTap: () {
-            shape.add(setState);
-          },
         ),
       ],
     );
