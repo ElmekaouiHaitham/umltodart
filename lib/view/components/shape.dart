@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 // ignore: depend_on_referenced_packages
 import 'package:get/get.dart';
-import '../controllers/shape_controller.dart';
-import '../utils/constants.dart';
+import '../../controllers/shape_controller.dart';
+import '../../utils/constants.dart';
 
 abstract class Shape extends StatelessWidget {
   const Shape({Key? key}) : super(key: key);

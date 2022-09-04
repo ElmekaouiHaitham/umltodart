@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:umltodart/controllers/shape_controller.dart';
-import 'package:umltodart/models/shape.dart';
+import 'package:umltodart/view/components/shape.dart';
 
 class ShapeContainer extends StatefulWidget {
   final Shape child;

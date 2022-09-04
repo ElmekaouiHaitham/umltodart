@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:umltodart/models/shape.dart';
+import 'package:umltodart/view/components/shape.dart';
 
 import '../../utils/constants.dart';
 

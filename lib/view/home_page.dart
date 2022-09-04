@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:umltodart/utils/constants.dart';
-import 'package:umltodart/models/shape.dart';
+import 'package:umltodart/view/components/shape.dart';
 
 import '../utils/command.dart';
 import 'components/my_scroll_view.dart';
