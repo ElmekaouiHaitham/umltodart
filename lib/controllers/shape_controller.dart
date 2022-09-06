@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../models/field.dart';
 import '../models/method.dart';
+import '../utils/command.dart';
 import '../utils/constants.dart';
 import '../view/components/input_field.dart';
 
@@ -21,13 +22,15 @@ abstract class ShapeController extends GetxController {
   void edit(element);
 
   void add();
+
+  String buildCode();
 }
 
 class ClassController extends ShapeController {
   ClassController(super.xPos, super.yPos);
-
   RxList fields = [].obs;
   RxList methods = [].obs;
+  final TextEditingController titleController = TextEditingController();
 
   @override
   void add() {
@@ -53,7 +56,8 @@ class ClassController extends ShapeController {
 
   Future<void> addMethod() async {
     Method method = await _methodDialog();
-    methods.add(method);
+    var command = AddElementCommand(element: method, elements: methods);
+    _executeCommand(command);
   }
 
   Future<Method> _methodDialog(
@@ -170,7 +174,8 @@ class ClassController extends ShapeController {
 
   Future<void> addField() async {
     Field field = await _fieldDialog();
-    fields.add(field);
+    var command = AddElementCommand(element: field, elements: fields);
+    _executeCommand(command);
   }
 
   Future<Field> _fieldDialog({fieldName = '', fieldType = ''}) async {
@@ -205,8 +210,9 @@ class ClassController extends ShapeController {
     if (fields.contains(element)) {
       Field field =
           await _fieldDialog(fieldName: element.name, fieldType: element.type);
-      fields.remove(element);
-      fields.add(field);
+      var command = EditElementCommand(
+          oldElement: element, newElement: field, elements: fields);
+      _executeCommand(command);
     }
     if (methods.contains(element)) {
       Method method = await _methodDialog(
@@ -214,18 +220,61 @@ class ClassController extends ShapeController {
           returnType: element.returnType,
           argsNames: element.parameters.map((f) => f.name).toList(),
           argsTypes: element.parameters.map((f) => f.type).toList());
-      methods.remove(element);
-      methods.add(method);
+      var command = EditElementCommand(
+          oldElement: element, newElement: method, elements: methods);
+      _executeCommand(command);
     }
   }
 
   @override
   void remove(element) {
     if (fields.contains(element)) {
-      fields.remove(element);
+      var command = RemoveElementCommand(element: element, elements: fields);
+      _executeCommand(command);
     }
     if (methods.contains(element)) {
-      methods.remove(element);
+      var command = RemoveElementCommand(element: element, elements: methods);
+      _executeCommand(command);
     }
+  }
+
+  void _executeCommand(Command command) {
+    command.execute();
+    CommandHistory().add(command);
+  }
+
+  @override
+  String buildCode() {
+    return 'class ${titleController.text}{\n${_buildFields()}\n${_buildConstructor()}\n${buildMethods()}\n}';
+  }
+
+  String _buildConstructor() {
+    if (fields.isEmpty) {
+      return '';
+    }
+    String content = '';
+    for (var field in fields) {
+      if (field.type[field.type.length - 1] != '?') {
+        content += 'required ';
+      }
+      content += 'this.${field.name}, ';
+    }
+    return '    ${titleController.text}({$content});';
+  }
+
+  String _buildFields() {
+    String result = '';
+    for (var field in fields) {
+      result += field.buildCode();
+    }
+    return result;
+  }
+
+  String buildMethods() {
+    String result = '';
+    for (var method in methods) {
+      result += method.buildCode();
+    }
+    return result;
   }
 }

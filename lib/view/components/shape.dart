@@ -8,13 +8,12 @@ import 'element_container.dart';
 abstract class Shape extends StatelessWidget {
   const Shape({Key? key}) : super(key: key);
   ShapeController get controller;
+
   @override
   Widget build(BuildContext context);
 }
 
 class Class extends Shape {
-  final TextEditingController _titleController = TextEditingController();
-
   Class({Key? key}) : super(key: key);
 
   @override
@@ -32,7 +31,7 @@ class Class extends Shape {
             children: [
               TextField(
                 style: const TextStyle(fontWeight: FontWeight.bold),
-                controller: _titleController,
+                controller: controller.titleController,
                 decoration: const InputDecoration(
                   border: InputBorder.none,
                   hintText: "class's name",
@@ -78,3 +77,4 @@ class Class extends Shape {
     );
   }
 }
+

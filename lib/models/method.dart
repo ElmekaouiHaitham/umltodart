@@ -19,4 +19,16 @@ class Method {
     }
     return result;
   }
+
+  String buildCode() {
+    return "    $returnType $name(${_buildParms()}){};";
+  }
+
+  String _buildParms() {
+    String result = "";
+    for (var par in parameters) {
+      result += '${par.type} ${par.name}, ';
+    }
+    return result;
+  }
 }

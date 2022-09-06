@@ -15,7 +15,7 @@ class ElementContainer extends StatelessWidget {
         IconButton(onPressed: onRemove, icon: const Icon(Icons.remove)),
         Text(text),
         IconButton(
-            onPressed: () => onEdit, icon: const Icon(Icons.edit_rounded)),
+            onPressed: onEdit, icon: const Icon(Icons.edit_rounded)),
       ],
     );
   }

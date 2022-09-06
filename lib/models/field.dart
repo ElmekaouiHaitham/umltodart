@@ -7,4 +7,8 @@ class Field {
   String toString() {
     return '$name: $type';
   }
+
+  String buildCode() {
+    return '    $type $name;\n';
+  }
 }

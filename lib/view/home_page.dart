@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:umltodart/utils/constants.dart';
 import 'package:umltodart/view/components/shape.dart';
-
+// ignore: depend_on_referenced_packages
+import 'package:get/get.dart';
 import '../utils/command.dart';
 import 'components/my_scroll_view.dart';
 import 'components/shape_container.dart';
@@ -64,7 +65,7 @@ class _HomePageState extends State<HomePage> {
               },
               icon: const Icon(Icons.undo_sharp)),
           IconButton(
-              onPressed: () {}, icon: const Icon(Icons.play_arrow_sharp)),
+              onPressed: _buildCode, icon: const Icon(Icons.play_arrow_sharp)),
         ],
       ),
       body: Row(
@@ -132,8 +133,24 @@ class _HomePageState extends State<HomePage> {
   onShapeDelete(Shape shape) {
     setState(() {
       var command = RemoveShapeCommand(shapes: shapes, shape: shape);
-      command.execute();
       _commandHistory.add(command);
     });
+  }
+
+  void _buildCode() {
+    Get.dialog(AlertDialog(
+      content: Column(
+          children: shapes
+              .map((shape) => Container(
+                    padding: const EdgeInsets.all(kDefaultPadding),
+                    margin: const EdgeInsets.all(kDefaultPadding),
+                    color: kCodeBackgroundColor,
+                    constraints:
+                        const BoxConstraints(minWidth: kCodeBackgroundMinWidth),
+                    child: SelectableText(shape.controller.buildCode(),
+                        style: const TextStyle(color: Colors.black)),
+                  ))
+              .toList()),
+    ));
   }
 }

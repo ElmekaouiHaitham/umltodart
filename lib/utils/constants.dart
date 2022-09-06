@@ -17,3 +17,7 @@ const kSideBarWidth = 200.0;
 const kShapeMinWidth = 200.0;
 
 const kShapeMaxWidth = 400.0;
+
+const kCodeBackgroundColor = Color(0xFFD1D1D2);
+
+const kCodeBackgroundMinWidth = 400.0;
