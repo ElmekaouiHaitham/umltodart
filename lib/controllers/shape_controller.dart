@@ -16,9 +16,9 @@ abstract class ShapeController extends GetxController {
 
   ShapeController(this.xPos, this.yPos);
 
-  void remove();
+  void remove(element);
 
-  void edit();
+  void edit(element);
 
   void add();
 }
@@ -51,159 +51,181 @@ class ClassController extends ShapeController {
     ));
   }
 
-  void addMethod() {
-    final TextEditingController nameController = TextEditingController();
-    final TextEditingController returnTypeController = TextEditingController();
-    final List<TextEditingController> argNamesController = [];
-    final List<TextEditingController> argTypeController = [];
-    Get.dialog(_buildMethodDialog(nameController, argNamesController, argTypeController, returnTypeController));
+  Future<void> addMethod() async {
+    Method method = await _methodDialog();
+    methods.add(method);
   }
 
-  AlertDialog _buildMethodDialog(TextEditingController nameController, List<TextEditingController> argNamesController, List<TextEditingController> argTypeController, TextEditingController returnTypeController) {
-    return AlertDialog(
-    content: SingleChildScrollView(
-      child: Column(
-        children: [
-          // name section
-          MyInputField(
-              nameController: nameController, hintText: "method's name"),
-          // args section
-          StatefulBuilder(builder: (context, setState) {
-            return Column(
-              children: [
-                FittedBox(
-                  fit: BoxFit.scaleDown,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.remove),
-                        onPressed: () {
-                          if (argNamesController.isNotEmpty) {
+  Future<Method> _methodDialog(
+      {name = '', argsNames, argsTypes, returnType = ''}) async {
+    TextEditingController nameController = TextEditingController(text: name);
+    TextEditingController returnTypeController =
+        TextEditingController(text: returnType);
+    List<TextEditingController> argNamesController = [];
+    List<TextEditingController> argTypeController = [];
+    // inti the controllers
+    if (argsNames != null) {
+      for (int i = 0; i < argsNames.length; i++) {
+        argNamesController.add(TextEditingController(text: argsNames[i]));
+        argTypeController.add(TextEditingController(text: argsTypes[i]));
+      }
+    }
+    await Get.dialog(AlertDialog(
+      content: SingleChildScrollView(
+        child: Column(
+          children: [
+            // name section
+            MyInputField(
+                nameController: nameController, hintText: "method's name"),
+            // args section
+            StatefulBuilder(builder: (context, setState) {
+              return Column(
+                children: [
+                  FittedBox(
+                    fit: BoxFit.scaleDown,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.remove),
+                          onPressed: () {
+                            if (argNamesController.isNotEmpty) {
+                              setState(() {
+                                argNamesController.removeLast();
+                              });
+                            }
+                          },
+                        ),
+                        Text(
+                          '${argNamesController.length}',
+                        ),
+                        IconButton(
+                          icon: const Icon(Icons.add),
+                          onPressed: () {
                             setState(() {
-                              argNamesController.removeLast();
+                              argNamesController.add(TextEditingController());
+                              argTypeController.add(TextEditingController());
                             });
-                          }
-                        },
-                      ),
-                      Text(
-                        '${argNamesController.length}',
-                      ),
-                      IconButton(
-                        icon: const Icon(Icons.add),
-                        onPressed: () {
-                          setState(() {
-                            argNamesController.add(TextEditingController());
-                            argTypeController.add(TextEditingController());
-                          });
-                        },
-                      ),
-                    ],
+                          },
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                const Divider(
-                  color: Colors.grey,
-                  thickness: 1,
-                  indent: 20,
-                  endIndent: 20,
-                ),
-                ...List.generate(
-                    argNamesController.length,
-                    (index) => Column(
-                          children: [
-                            Row(children: [
-                              // args' name
-                              MyInputField(
-                                  nameController: argNamesController[index],
-                                  hintText: "arg's name"),
-                              // the ":"
-                              const Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: kSmallPadding),
-                                  child: Text(':')),
-                              // arg's type
-                              MyInputField(
-                                  nameController: argTypeController[index],
-                                  hintText: "arg's type"),
-                            ]),
-                            const SizedBox(height: kSmallPadding),
-                          ],
-                        )),
-              ],
-            );
-          }),
-          // return type section
-          MyInputField(
-              nameController: returnTypeController,
-              hintText: "method's return type"),
-        ],
+                  const Divider(
+                    color: Colors.grey,
+                    thickness: 1,
+                    indent: 20,
+                    endIndent: 20,
+                  ),
+                  ...List.generate(
+                      argNamesController.length,
+                      (index) => Column(
+                            children: [
+                              Row(children: [
+                                // args' name
+                                MyInputField(
+                                    nameController: argNamesController[index],
+                                    hintText: "arg's name"),
+                                // the ":"
+                                const Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: kSmallPadding),
+                                    child: Text(':')),
+                                // arg's type
+                                MyInputField(
+                                    nameController: argTypeController[index],
+                                    hintText: "arg's type"),
+                              ]),
+                              const SizedBox(height: kSmallPadding),
+                            ],
+                          )),
+                ],
+              );
+            }),
+            // return type section
+            MyInputField(
+                nameController: returnTypeController,
+                hintText: "method's return type"),
+          ],
+        ),
       ),
-    ),
-    actions: [
-      TextButton(
-          onPressed: () {
-            _addMethod(argNamesController, argTypeController, nameController, returnTypeController);
-          },
-          child: const Text('done'))
-    ],
-  );
-  }
-
-  void _addMethod(List<TextEditingController> argNamesController, List<TextEditingController> argTypeController, TextEditingController nameController, TextEditingController returnTypeController) {
+      actions: [
+        TextButton(
+            onPressed: () {
+              Get.back();
+            },
+            child: const Text('done'))
+      ],
+    ));
     List<Field> fields2 = [];
     for (int i = 0; i < argNamesController.length; i++) {
       fields2.add(Field(
-          name: argNamesController[i].text,
-          type: argTypeController[i].text));
+          name: argNamesController[i].text, type: argTypeController[i].text));
     }
-    methods.add(Method(
+    return Method(
         name: nameController.text,
         returnType: returnTypeController.text,
-        parameters: fields2));
-    Get.back();
+        parameters: fields2);
   }
 
-  void addField() {
-    final TextEditingController fieldNameController = TextEditingController();
-    final TextEditingController fieldTypeController = TextEditingController();
-    Get.dialog(_buildFieldDialog(fieldNameController, fieldTypeController));
+  Future<void> addField() async {
+    Field field = await _fieldDialog();
+    fields.add(field);
   }
 
-  AlertDialog _buildFieldDialog(TextEditingController fieldNameController, TextEditingController fieldTypeController) {
-    return AlertDialog(
-    content: Row(children: [
-      MyInputField(
-          nameController: fieldNameController, hintText: "field's name"),
-      const Padding(
-          padding: EdgeInsets.symmetric(horizontal: kSmallPadding),
-          child: Text(':')),
-      MyInputField(
-          nameController: fieldTypeController, hintText: "field's type")
-    ]),
-    actions: [
-      TextButton(
-          onPressed: () {
-            _addField(fieldNameController, fieldTypeController);
-          },
-          child: const Text('done'))
-    ],
-  );
-  }
-
-  void _addField(TextEditingController fieldNameController, TextEditingController fieldTypeController) {
-    fields.add(Field(
-        name: fieldNameController.text,
-        type: fieldTypeController.text));
-    Get.back();
+  Future<Field> _fieldDialog({fieldName = '', fieldType = ''}) async {
+    TextEditingController fieldNameController =
+        TextEditingController(text: fieldName);
+    TextEditingController fieldTypeController =
+        TextEditingController(text: fieldType);
+    await Get.dialog(AlertDialog(
+      content: Row(children: [
+        MyInputField(
+            nameController: fieldNameController, hintText: "field's name"),
+        const Padding(
+            padding: EdgeInsets.symmetric(horizontal: kSmallPadding),
+            child: Text(':')),
+        MyInputField(
+            nameController: fieldTypeController, hintText: "field's type")
+      ]),
+      actions: [
+        TextButton(
+            onPressed: () {
+              Get.back();
+            },
+            child: const Text('done'))
+      ],
+    ));
+    return Field(
+        name: fieldNameController.text, type: fieldTypeController.text);
   }
 
   @override
-  void edit() {
-    // TODO: implement edit
+  Future<void> edit(element) async {
+    if (fields.contains(element)) {
+      Field field =
+          await _fieldDialog(fieldName: element.name, fieldType: element.type);
+      fields.remove(element);
+      fields.add(field);
+    }
+    if (methods.contains(element)) {
+      Method method = await _methodDialog(
+          name: element.name,
+          returnType: element.returnType,
+          argsNames: element.parameters.map((f) => f.name).toList(),
+          argsTypes: element.parameters.map((f) => f.type).toList());
+      methods.remove(element);
+      methods.add(method);
+    }
   }
 
   @override
-  void remove() {
-    // TODO: implement remove
+  void remove(element) {
+    if (fields.contains(element)) {
+      fields.remove(element);
+    }
+    if (methods.contains(element)) {
+      methods.remove(element);
+    }
   }
 }

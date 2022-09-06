@@ -36,14 +36,6 @@ class _ShapeContainerState extends State<ShapeContainer> {
     return Row(
       children: [
         GestureDetector(
-          onTap: shapeController.remove,
-          child: const Icon(Icons.remove),
-        ),
-        GestureDetector(
-          onTap: shapeController.edit,
-          child: const Icon(Icons.edit),
-        ),
-        GestureDetector(
           onTap: widget.onShapeDelete,
           child: const Icon(Icons.delete, color: Colors.red),
         ),

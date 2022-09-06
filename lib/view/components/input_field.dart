@@ -12,13 +12,13 @@ class MyInputField extends StatelessWidget {
   final TextEditingController nameController;
   final String hintText;
 
-
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       height: kDefaultInputHeight,
       width: kDefaultInputWidth,
       child: TextField(
+        textInputAction: TextInputAction.next,
         controller: nameController,
         decoration: InputDecoration(
           border: const OutlineInputBorder(),

@@ -30,6 +30,7 @@ class Class extends Shape {
           child: Column(
             children: [
               TextField(
+                style: const TextStyle(fontWeight: FontWeight.bold),
                 controller: _titleController,
                 decoration: const InputDecoration(
                   border: InputBorder.none,
@@ -45,7 +46,18 @@ class Class extends Shape {
                     () => (Column(
                       children: controller.fields
                           .map(
-                            (f) => Text(f.toString()),
+                            (f) => Row(
+                              // TODO: turn this to a widget
+                              children: [
+                                IconButton(
+                                    onPressed: () => controller.remove(f),
+                                    icon: const Icon(Icons.remove)),
+                                Text(f.toString()),
+                                IconButton(
+                                    onPressed: () => controller.edit(f),
+                                    icon: const Icon(Icons.edit_rounded)),
+                              ],
+                            ),
                           )
                           .toList(),
                     )),
@@ -58,7 +70,17 @@ class Class extends Shape {
                     () => (Column(
                       children: controller.methods
                           .map(
-                            (f) => Text(f.toString()),
+                            (m) => Row(
+                              children: [
+                                IconButton(
+                                    onPressed: () => controller.remove(m),
+                                    icon: const Icon(Icons.remove)),
+                                Text(m.toString()),
+                                IconButton(
+                                    onPressed: () => controller.edit(m),
+                                    icon: const Icon(Icons.edit_rounded)),
+                              ],
+                            ),
                           )
                           .toList(),
                     )),
