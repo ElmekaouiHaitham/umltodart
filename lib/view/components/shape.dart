@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../controllers/shape_controller.dart';
 import '../../utils/constants.dart';
+import 'element_container.dart';
 
 abstract class Shape extends StatelessWidget {
   const Shape({Key? key}) : super(key: key);
@@ -46,18 +47,10 @@ class Class extends Shape {
                     () => (Column(
                       children: controller.fields
                           .map(
-                            (f) => Row(
-                              // TODO: turn this to a widget
-                              children: [
-                                IconButton(
-                                    onPressed: () => controller.remove(f),
-                                    icon: const Icon(Icons.remove)),
-                                Text(f.toString()),
-                                IconButton(
-                                    onPressed: () => controller.edit(f),
-                                    icon: const Icon(Icons.edit_rounded)),
-                              ],
-                            ),
+                            (f) => ElementContainer(
+                                text: f.toString(),
+                                onRemove: () => controller.remove(f),
+                                onEdit: () => controller.edit(f)),
                           )
                           .toList(),
                     )),
@@ -70,17 +63,10 @@ class Class extends Shape {
                     () => (Column(
                       children: controller.methods
                           .map(
-                            (m) => Row(
-                              children: [
-                                IconButton(
-                                    onPressed: () => controller.remove(m),
-                                    icon: const Icon(Icons.remove)),
-                                Text(m.toString()),
-                                IconButton(
-                                    onPressed: () => controller.edit(m),
-                                    icon: const Icon(Icons.edit_rounded)),
-                              ],
-                            ),
+                            (m) => ElementContainer(
+                                text: m.toString(),
+                                onRemove: () => controller.remove(m),
+                                onEdit: () => controller.edit(m)),
                           )
                           .toList(),
                     )),
