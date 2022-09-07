@@ -1,3 +1,5 @@
+import '../utils/constants.dart';
+
 class Field {
   String name;
   String type;
@@ -9,6 +11,6 @@ class Field {
   }
 
   String buildCode() {
-    return '    $type $name;\n';
+    return '${tabs(1)}$type $name;\n';
   }
 }

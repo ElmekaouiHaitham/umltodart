@@ -259,7 +259,7 @@ class ClassController extends ShapeController {
       }
       content += 'this.${field.name}, ';
     }
-    return '    ${titleController.text}({$content});';
+    return '${tabs(2)}${titleController.text}({$content});';
   }
 
   String _buildFields() {
@@ -278,3 +278,4 @@ class ClassController extends ShapeController {
     return result;
   }
 }
+

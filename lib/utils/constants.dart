@@ -21,3 +21,7 @@ const kShapeMaxWidth = 400.0;
 const kCodeBackgroundColor = Color(0xFFD1D1D2);
 
 const kCodeBackgroundMinWidth = 400.0;
+
+String tabs(int num) {
+  return '  ' * num;
+}

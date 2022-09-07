@@ -1,3 +1,4 @@
+import '../utils/constants.dart';
 import 'field.dart';
 
 class Method {
@@ -21,14 +22,18 @@ class Method {
   }
 
   String buildCode() {
-    return "    $returnType $name(${_buildParms()}){};";
+    return '${tabs(1)}$returnType $name(${_buildParms()}){\n${_buildBody()}\n}';
   }
 
   String _buildParms() {
-    String result = "";
+    String result = '';
     for (var par in parameters) {
       result += '${par.type} ${par.name}, ';
     }
     return result;
+  }
+
+  String _buildBody() {
+    return '${tabs(2)}//TODO: implement test\n${tabs(2)}throw UnimplementedError();';
   }
 }
