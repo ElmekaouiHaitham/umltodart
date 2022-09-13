@@ -6,16 +6,23 @@ import '../models/method.dart';
 import '../utils/command.dart';
 import '../utils/constants.dart';
 import '../view/components/input_field.dart';
+import '../view/components/links.dart';
+import '../view/components/shape.dart';
 
 abstract class ShapeController extends GetxController {
   double xPos;
   double yPos;
+
+  List<LinkData> connections = [];
+
   void setPosition(x, y) {
     xPos = x;
     yPos = y;
   }
 
   ShapeController(this.xPos, this.yPos);
+
+  String get name;
 
   void remove(element);
 
@@ -245,7 +252,9 @@ class ClassController extends ShapeController {
 
   @override
   String buildCode() {
-    return 'class ${titleController.text}{\n${_buildFields()}\n${_buildConstructor()}\n${buildMethods()}\n}';
+    Shape? inherited = _checkGeneralization();
+    List<Shape> compositions = _checkComposition();
+    return '${_buildName(inherited)} {\n${_buildFields(compositions)}\n${_buildConstructor()}\n${buildMethods()}\n}';
   }
 
   String _buildConstructor() {
@@ -259,11 +268,16 @@ class ClassController extends ShapeController {
       }
       content += 'this.${field.name}, ';
     }
-    return '${tabs(2)}${titleController.text}({$content});';
+    return '${tabs(2)}$name({$content});';
   }
 
-  String _buildFields() {
+  String _buildFields(List<Shape> compositions) {
     String result = '';
+    for (var composition in compositions) {
+      fields.add(Field(
+          name: composition.controller.name.toLowerCase(),
+          type: composition.controller.name));
+    }
     for (var field in fields) {
       result += field.buildCode();
     }
@@ -277,5 +291,32 @@ class ClassController extends ShapeController {
     }
     return result;
   }
-}
 
+  @override
+  String get name => titleController.text;
+
+  set name(String name) => titleController.text = name;
+
+  Shape? _checkGeneralization() {
+    for (var connection in connections) {
+      if (connection.linkType == LinkType.generalizationLink) {
+        return connection.targetShape;
+      }
+    }
+    return null;
+  }
+
+  List<Shape> _checkComposition() {
+    List<Shape> compositions = [];
+    for (var connection in connections) {
+      if (connection.linkType == LinkType.composition) {
+        compositions.add(connection.targetShape);
+      }
+    }
+    return compositions;
+  }
+
+  String _buildName(Shape? inherited) {
+    return 'class $name ${inherited != null ? 'extends ${inherited.controller.name}' : ''}';
+  }
+}

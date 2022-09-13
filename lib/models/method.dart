@@ -37,3 +37,4 @@ class Method {
     return '${tabs(2)}//TODO: implement test\n${tabs(2)}throw UnimplementedError();';
   }
 }
+

@@ -10,13 +10,14 @@ class ElementContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: [
-        IconButton(onPressed: onRemove, icon: const Icon(Icons.remove)),
-        Text(text),
-        IconButton(
-            onPressed: onEdit, icon: const Icon(Icons.edit_rounded)),
-      ],
+    return FittedBox(
+      child: Row(
+        children: [
+          IconButton(onPressed: onRemove, icon: const Icon(Icons.remove)),
+          Text(text),
+          IconButton(onPressed: onEdit, icon: const Icon(Icons.edit_rounded)),
+        ],
+      ),
     );
   }
 }

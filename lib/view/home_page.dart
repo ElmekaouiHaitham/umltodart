@@ -4,6 +4,7 @@ import 'package:umltodart/view/components/shape.dart';
 // ignore: depend_on_referenced_packages
 import 'package:get/get.dart';
 import '../utils/command.dart';
+import 'components/links.dart';
 import 'components/my_scroll_view.dart';
 import 'components/shape_container.dart';
 import 'components/side_bar.dart';
@@ -16,7 +17,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  Container test = Container();
   Offset offset = Offset.zero;
   List<Shape> shapes = [];
   final ScrollController _scrollControllerV = ScrollController();
@@ -28,6 +28,10 @@ class _HomePageState extends State<HomePage> {
       MediaQueryData.fromWindow(WidgetsBinding.instance.window).size.width -
           100;
   final CommandHistory _commandHistory = CommandHistory();
+
+  // this for link tracking
+
+  Shape? sourceShape;
 
   @override
   void initState() {
@@ -83,13 +87,16 @@ class _HomePageState extends State<HomePage> {
             child: GridPaper(
               child: DragTarget(
                 builder: (context, _, __) {
-                  return Stack(
-                      children: shapes.map((shape) {
-                    return ShapeContainer(
-                      onShapeDelete: () => onShapeDelete(shape),
-                      child: shape,
-                    );
-                  }).toList());
+                  return Stack(children: [
+                    ...shapes.map((shape) {
+                      return ShapeContainer(
+                        onShapeDelete: () => onShapeDelete(shape),
+                        onLink: () => onShapeLink(shape),
+                        child: shape,
+                      );
+                    }).toList(),
+                    ..._showLinks(),
+                  ]);
                 },
                 onAcceptWithDetails: onAccept,
               ),
@@ -103,8 +110,10 @@ class _HomePageState extends State<HomePage> {
   void onAccept(DragTargetDetails details) {
     setState(() {
       Shape shape = details.data;
-      double xPos = details.offset.dx - 200 + _scrollControllerH.offset;
-      double yPos = details.offset.dy - 56 + _scrollControllerV.offset;
+      double xPos =
+          details.offset.dx - kSideBarWidth + _scrollControllerH.offset;
+      double yPos =
+          details.offset.dy - kAppBarHeight + _scrollControllerV.offset;
       // if the shape is dragged from side_bare
       if (!shapes.contains(shape)) {
         _addShape(shape, xPos, yPos);
@@ -134,6 +143,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       var command = RemoveShapeCommand(shapes: shapes, shape: shape);
       _commandHistory.add(command);
+      _executeCommand(command);
     });
   }
 
@@ -152,5 +162,63 @@ class _HomePageState extends State<HomePage> {
                   ))
               .toList()),
     ));
+  }
+
+  Future<void> onShapeLink(Shape targetShape) async {
+    if (sourceShape == null) {
+      sourceShape = targetShape;
+      Get.snackbar(
+          'instructions', 'please select the shape you want to connect to');
+    } else {
+      LinkType linkType = LinkType.values[0];
+      await Get.dialog(AlertDialog(
+        content: StatefulBuilder(
+          builder: (context, setStateD) => DropdownButton<LinkType>(
+            value: linkType,
+            icon: const Icon(Icons.arrow_downward),
+            elevation: 16,
+            style: const TextStyle(color: Colors.deepPurple),
+            underline: Container(
+              height: 2,
+              color: Colors.deepPurpleAccent,
+            ),
+            onChanged: (LinkType? value) {
+              // This is called when the user selects an item.
+              setStateD(() {
+                linkType = value!;
+              });
+            },
+            items: LinkType.values
+                .map(
+                  (e) => DropdownMenuItem<LinkType>(
+                    value: e,
+                    child: Text(e.toString()),
+                  ),
+                )
+                .toList(),
+          ),
+        ),
+      ));
+      sourceShape!.controller.connections.add(LinkData(
+          linkType: linkType,
+          targetShape: targetShape,
+          sourceShape: sourceShape!));
+      sourceShape = null;
+      setState(() {});
+    }
+  }
+
+  List<Widget> _showLinks() {
+    List<Widget> links = [];
+    for (var shape in shapes) {
+      for (var link in shape.controller.connections) {
+        if (shapes.contains(link.targetShape)) {
+          links.add(CustomPaint(
+            painter: link.linkPainter,
+          ));
+        }
+      }
+    }
+    return links;
   }
 }

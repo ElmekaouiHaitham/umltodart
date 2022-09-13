@@ -11,10 +11,15 @@ abstract class Shape extends StatelessWidget {
 
   @override
   Widget build(BuildContext context);
+  Size? get size;
+  Offset? get centerPos;
+  double get heightByWidth;
 }
 
 class Class extends Shape {
   Class({Key? key}) : super(key: key);
+
+  final GlobalKey _widgetKey = GlobalKey();
 
   @override
   final ClassController controller = ClassController(0, 0);
@@ -22,6 +27,7 @@ class Class extends Shape {
   Widget build(BuildContext context) {
     return Card(
       child: Container(
+        key: _widgetKey,
         constraints: const BoxConstraints(
             minWidth: kShapeMinWidth, maxWidth: kShapeMaxWidth),
         decoration:
@@ -76,5 +82,17 @@ class Class extends Shape {
       ),
     );
   }
-}
 
+  @override
+  Size? get size => _widgetKey.currentContext?.size;
+
+  @override
+  Offset? get centerPos {
+    // the 30 is added to fix a problem that idk where it is from
+    return Offset(controller.xPos + size!.width / 2,
+        controller.yPos + 30 + size!.height / 2);
+  }
+
+  @override
+  double get heightByWidth => size!.height / size!.width;
+}
